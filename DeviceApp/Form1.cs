@@ -114,7 +114,7 @@ namespace DeviceApp
                     Graphics g = Graphics.FromImage(bit);
                     g.CopyFromScreen(new Point(Control.MousePosition.X, Control.MousePosition.Y), new Point(0, 0), bit.Size);
                     string base64 = ToBase64(bit);
-                    dh.state = "data:image/jpeg;base64,"+base64;
+                    dh.state = base64;
                     str = SetJson(dh);
                     bytes = Encoding.GetEncoding("GB2312").GetBytes(str);
                     server.SendTo(bytes, ip);
