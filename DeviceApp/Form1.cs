@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Web.Script.Serialization;
 using System.Threading;
 using System.Drawing;
+using System.IO;
 
 namespace DeviceApp
 {
@@ -77,7 +78,7 @@ namespace DeviceApp
                     }
                     else
                     {
-                        dh.state = "已经响应指令："+ dh.state;
+                        dh.state = "已经响应指令：" + dh.state;
                     }
                     dh.type = "response";
                     bytes = Encoding.GetEncoding("GB2312").GetBytes(SetJson(dh));
@@ -99,6 +100,23 @@ namespace DeviceApp
                     }
                     dh.type = "response";
                     bytes = Encoding.GetEncoding("GB2312").GetBytes(SetJson(dh));
+                    server.SendTo(bytes, ip);
+                    addText(string.Format("To Sever:{0}\r\n\r\n", SetJson(dh)));
+                }
+                else
+                if (dh.type == "getpicture")
+                {
+                    dh.type = "uploadpicture";
+                    dh.userid = textBox3.Text;
+                    dh.deviceid = "1";
+
+                    Bitmap bit = new Bitmap(50, 50);
+                    Graphics g = Graphics.FromImage(bit);
+                    g.CopyFromScreen(new Point(Control.MousePosition.X, Control.MousePosition.Y), new Point(0, 0), bit.Size);
+                    string base64 = ToBase64(bit);
+                    dh.state = "data:image/jpeg;base64,"+base64;
+                    str = SetJson(dh);
+                    bytes = Encoding.GetEncoding("GB2312").GetBytes(str);
                     server.SendTo(bytes, ip);
                     addText(string.Format("To Sever:{0}\r\n\r\n", SetJson(dh)));
                 }
@@ -233,6 +251,56 @@ namespace DeviceApp
             catch (Exception ex)
             {
                 addText(ex.ToString() + "\r\n\r\n");
+            }
+        }
+
+        //图片转为base64编码的文本   
+        private string ToBase64(Bitmap bmp)
+        {
+            try
+            {
+                MemoryStream ms = new MemoryStream();
+                bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                byte[] arr = new byte[ms.Length];
+                ms.Position = 0;
+                ms.Read(arr, 0, (int)ms.Length);
+                ms.Close();
+                String strbaser64 = Convert.ToBase64String(arr);
+                return strbaser64;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ImgToBase64String 转换失败 Exception:" + ex.Message);
+                return "";
+            }
+        }
+
+        //base64编码的文本转为图片  
+        private void Base64StringToImage(string txtFileName)
+        {
+            try
+            {
+                FileStream ifs = new FileStream(txtFileName, FileMode.Open, FileAccess.Read);
+                StreamReader sr = new StreamReader(ifs);
+
+                String inputStr = sr.ReadToEnd();
+                byte[] arr = Convert.FromBase64String(inputStr);
+                MemoryStream ms = new MemoryStream(arr);
+                Bitmap bmp = new Bitmap(ms);
+
+                bmp.Save(txtFileName + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+                //bmp.Save(txtFileName + ".bmp", ImageFormat.Bmp);  
+                //bmp.Save(txtFileName + ".gif", ImageFormat.Gif);  
+                //bmp.Save(txtFileName + ".png", ImageFormat.Png);  
+                ms.Close();
+                sr.Close();
+                ifs.Close();
+
+                MessageBox.Show("转换成功！");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Base64StringToImage 转换失败/nException：" + ex.Message);
             }
         }
     }
