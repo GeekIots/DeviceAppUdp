@@ -7,6 +7,14 @@ using System.Web.Script.Serialization;
 using System.Threading;
 using System.Drawing;
 using System.IO;
+using AForge;
+using AForge.Controls;
+using AForge.Imaging;
+using AForge.Video;
+using AForge.Video.DirectShow;
+using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
+using MySql.Data.MySqlClient;
 
 namespace DeviceApp
 {
@@ -16,11 +24,19 @@ namespace DeviceApp
         IPEndPoint ip;
         Socket server;
         Thread recThread;
-        int num = 0;
+
+
+        FilterInfoCollection videoDevices;
+        VideoCaptureDevice videoSource;
+        public int selectedDeviceIndex = 0;
+
+
         public Form1()
         {
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
+
+
         }
 
         public void addText(string str)
@@ -35,11 +51,12 @@ namespace DeviceApp
             LED.BackColor = Color.Red;
         }
 
-
+        string base64 = string.Empty;
         private void RecMothed()
         {
             string str = string.Empty;
             int recv = 0;
+            int num = 0;
             IPEndPoint sender1 = new IPEndPoint(IPAddress.Any, 0);
             EndPoint Remote = (EndPoint)(sender1);
             server.Bind(Remote);
@@ -103,23 +120,76 @@ namespace DeviceApp
                     server.SendTo(bytes, ip);
                     addText(string.Format("To Sever:{0}\r\n\r\n", SetJson(dh)));
                 }
-                else
-                if (dh.type == "getpicture")
-                {
-                    dh.type = "uploadpicture";
-                    dh.userid = textBox3.Text;
-                    dh.deviceid = "1";
+            }
+        }
 
-                    Bitmap bit = new Bitmap(50, 50);
-                    Graphics g = Graphics.FromImage(bit);
-                    g.CopyFromScreen(new Point(Control.MousePosition.X, Control.MousePosition.Y), new Point(0, 0), bit.Size);
-                    string base64 = ToBase64(bit);
-                    dh.state = base64;
-                    str = SetJson(dh);
-                    bytes = Encoding.GetEncoding("GB2312").GetBytes(str);
-                    server.SendTo(bytes, ip);
-                    addText(string.Format("To Sever:{0}\r\n\r\n", SetJson(dh)));
-                }
+        ///
+        /// Resize图片
+        ///
+        /// 原始Bitmap
+        /// 新的宽度
+        /// 新的高度
+        /// 保留着，暂时未用
+        /// 处理以后的图片
+        public static Bitmap ResizeImage(Bitmap bmp, int newW, int newH)
+        {
+            try
+            {
+                Bitmap b = new Bitmap(newW, newH);
+                Graphics g = Graphics.FromImage(b);
+                // 插值算法的质量
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawImage(bmp, new Rectangle(0, 0, newW, newH), new Rectangle(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
+                g.Dispose();
+                return b;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // ===============================
+        ///
+        /// 剪裁 -- 用GDI+
+        ///
+        /// 原始Bitmap
+        /// 开始坐标X
+        /// 开始坐标Y
+        /// 宽度
+        /// 高度
+        /// 剪裁后的Bitmap
+        public static Bitmap KiCut(Bitmap b, int StartX, int StartY, int iWidth, int iHeight)
+        {
+            if (b == null)
+            {
+                return null;
+            }
+            int w = b.Width;
+            int h = b.Height;
+            if (StartX >= w || StartY >= h)
+            {
+                return null;
+            }
+            if (StartX + iWidth > w)
+            {
+                iWidth = w - StartX;
+            }
+            if (StartY + iHeight > h)
+            {
+                iHeight = h - StartY;
+            }
+            try
+            {
+                Bitmap bmpOut = new Bitmap(iWidth, iHeight, PixelFormat.Format24bppRgb);
+                Graphics g = Graphics.FromImage(bmpOut);
+                g.DrawImage(b, new Rectangle(0, 0, iWidth, iHeight), new Rectangle(StartX, StartY, iWidth, iHeight), GraphicsUnit.Pixel);
+                g.Dispose();
+                return bmpOut;
+            }
+            catch
+            {
+                return null;
             }
         }
         /// <summary>
@@ -232,21 +302,44 @@ namespace DeviceApp
                 timer1.Stop();
             }
         }
-
+        int num = 0; int count = 0;
         private void timer1_Tick(object sender, EventArgs e)
         {
-            timer1.Interval = 10000;
+            timer1.Interval = 100;
+            count++;
             try
             {
-                DeviceHelper dh = new DeviceHelper();
-                dh.type = "identity";
-                dh.userid = textBox3.Text;
-                dh.deviceid = "1";
-                dh.state = "";
-                string str = SetJson(dh);
-                bytes = Encoding.GetEncoding("GB2312").GetBytes(str);
-                server.SendTo(bytes, ip);
-                addText(string.Format("To Sever:{0}\r\n\r\n", str));
+                if (count == 100)
+                {
+                    count = 0;
+                    DeviceHelper dh = new DeviceHelper();
+                    dh.type = "identity";
+                    dh.userid = textBox3.Text;
+                    dh.deviceid = "1";
+                    dh.state = "";
+                    string str = SetJson(dh);
+                    bytes = Encoding.GetEncoding("GB2312").GetBytes(str);
+                    server.SendTo(bytes, ip);
+                    addText(string.Format("To Sever:{0}\r\n\r\n", str));
+
+                }
+
+                //更新图像
+                num++;
+                if (num == 5)
+                {
+                    num = 0;
+                    if (cammer)
+                    {
+                        Bitmap bit1 = videoSourcePlayer1.GetCurrentVideoFrame();
+                        Bitmap bit = ResizeImage(bit1, 320, 180);
+                        base64 = ToBase64(bit);
+                        bit1.Dispose();
+                        bit.Dispose();
+
+                        videoupdata(base64);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -302,6 +395,164 @@ namespace DeviceApp
             {
                 MessageBox.Show("Base64StringToImage 转换失败/nException：" + ex.Message);
             }
+        }
+
+        bool cammer = false;
+        private void button4_Click(object sender, EventArgs e)
+        {
+            videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            selectedDeviceIndex = 0;
+            videoSource = new VideoCaptureDevice(videoDevices[selectedDeviceIndex].MonikerString);//连接摄像头。
+            videoSource.VideoResolution = videoSource.VideoCapabilities[selectedDeviceIndex];
+            videoSourcePlayer1.VideoSource = videoSource;
+            // set NewFrame event handler
+            videoSourcePlayer1.Start();
+            cammer = true;
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (videoSource == null)
+                return;
+            Bitmap bitmap = videoSourcePlayer1.GetCurrentVideoFrame();
+            pictureBox1.Image = new Bitmap(bitmap);
+            bitmap.Dispose();
+        }
+
+
+
+        /// <summary>
+        /// 建立mysql数据库链接
+        /// </summary>
+        /// <returns></returns>
+        public static MySqlConnection getMySqlCon()
+        {
+            String mysqlStr = "Database=web;Data Source=120.27.45.38;User Id=root;Password=root;pooling=false;CharSet=utf8;port=3306";
+            // String mySqlCon = ConfigurationManager.ConnectionStrings["MySqlCon"].ConnectionString;
+            MySqlConnection mysql = new MySqlConnection(mysqlStr);
+            return mysql;
+        }
+        /// <summary>
+        /// 建立执行命令语句对象
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="mysql"></param>
+        /// <returns></returns>
+        public static MySqlCommand getSqlCommand(String sql, MySqlConnection mysql)
+        {
+            MySqlCommand mySqlCommand = new MySqlCommand(sql, mysql);
+            //  MySqlCommand mySqlCommand = new MySqlCommand(sql);
+            // mySqlCommand.Connection = mysql;
+            return mySqlCommand;
+        }
+        /// <summary>
+        /// 查询并获得结果集并遍历
+        /// </summary>
+        /// <param name="mySqlCommand"></param>
+        public static void getResultset(MySqlCommand mySqlCommand)
+        {
+            MySqlDataReader reader = mySqlCommand.ExecuteReader();
+            try
+            {
+                string rs = string.Empty;
+                while (reader.Read())
+                {
+                    if (reader.HasRows)
+                    {
+                        rs += reader.GetInt32(0) + "  ";
+                        for (int i = 1; i < reader.FieldCount; i++)
+                            rs += reader.GetString(i) + "  ";
+                        rs += "\r\n";
+                    }
+                }
+                MessageBox.Show(rs);
+            }
+            catch (Exception)
+            {
+
+                Console.WriteLine("查询失败了！");
+            }
+            finally
+            {
+                reader.Close();
+            }
+        }
+        /// <summary>
+        /// 添加数据
+        /// </summary>
+        /// <param name="mySqlCommand"></param>
+        public static void getInsert(MySqlCommand mySqlCommand)
+        {
+            try
+            {
+                mySqlCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                String message = ex.Message;
+                MessageBox.Show(message);
+                Console.WriteLine("插入数据失败了！" + message);
+            }
+
+        }
+        /// <summary>
+        /// 修改数据
+        /// </summary>
+        /// <param name="mySqlCommand"></param>
+        public static void getUpdate(MySqlCommand mySqlCommand)
+        {
+            try
+            {
+                mySqlCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+
+                String message = ex.Message;
+                Console.WriteLine("修改数据失败了！" + message);
+            }
+        }
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <param name="mySqlCommand"></param>
+        public static void getDel(MySqlCommand mySqlCommand)
+        {
+            try
+            {
+                mySqlCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                String message = ex.Message;
+                Console.WriteLine("删除数据失败了！" + message);
+            }
+        }
+
+        //更新图像
+        private void videoupdata(string base64)
+        {
+            try
+            {
+                //创建数据库连接对象
+                MySqlConnection mysql = getMySqlCon();
+
+                //打开数据库
+                mysql.Open();
+
+                //修改sql
+                String sqlUpdate = "update video set base64='"+base64+"' where id = 0";
+                MySqlCommand mySqlCommand = getSqlCommand(sqlUpdate, mysql);
+                mySqlCommand.ExecuteNonQuery();
+
+                //关闭
+                mysql.Close();
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.ToString());
+            }
+            
         }
     }
 
