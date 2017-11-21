@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Web.Script.Serialization;
 using System.Threading;
 using System.Drawing;
+<<<<<<< HEAD
 using System.IO;
 using AForge;
 using AForge.Controls;
@@ -15,6 +16,8 @@ using AForge.Video.DirectShow;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 using MySql.Data.MySqlClient;
+=======
+>>>>>>> parent of c67c1ad... 1
 
 namespace DeviceApp
 {
@@ -148,7 +151,7 @@ namespace DeviceApp
                     }
                     else
                     {
-                        dh.state = "已经响应指令：" + dh.state;
+                        dh.state = "已经响应指令："+ dh.state;
                     }
                     dh.type = "response";
                     bytes = Encoding.GetEncoding("GB2312").GetBytes(SetJson(dh));
@@ -173,6 +176,7 @@ namespace DeviceApp
                     server.SendTo(bytes, ip);
                     addText(string.Format("To Sever:{0}\r\n\r\n", SetJson(dh)));
                 }
+<<<<<<< HEAD
             }
         }
 
@@ -243,6 +247,8 @@ namespace DeviceApp
             catch
             {
                 return null;
+=======
+>>>>>>> parent of c67c1ad... 1
             }
         }
         /// <summary>
@@ -377,6 +383,7 @@ namespace DeviceApp
             server.SendTo(bytes, ip);
             addText(string.Format("To Sever:{0}\r\n\r\n", str));
         }
+<<<<<<< HEAD
 
         //图片转为base64编码的文本   
         private string ToBase64(Bitmap bmp)
@@ -582,6 +589,8 @@ namespace DeviceApp
             }
 
         }
+=======
+>>>>>>> parent of c67c1ad... 1
     }
 
     /// <summary>
