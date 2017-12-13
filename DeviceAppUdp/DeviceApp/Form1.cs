@@ -31,7 +31,7 @@ namespace DeviceApp
         private void Form1_Load(object sender, EventArgs e)
         {
             button1.Enabled = false;
-            LED.BackColor = Color.Red;
+            //LED.BackColor = Color.Red;
         }
 
 
@@ -64,18 +64,18 @@ namespace DeviceApp
                     if (dh.type == "set")
                     {
                         num++;
-                        labelSet.Text = num.ToString();
+                        //labelSet.Text = num.ToString();
                         //返回数据
                         if (dh.state == textBox_opencmd.Text)
                         {
                             dh.state = "灯已经开了";
-                            LED.BackColor = Color.Green;
+                            //LED.BackColor = Color.Green;
                         }
                         else
                         if (dh.state == textBox_closecmd.Text)
                         {
                             dh.state = "灯已经关了";
-                            LED.BackColor = Color.Red;
+                            //LED.BackColor = Color.Red;
                         }
                         else
                         {
@@ -90,15 +90,15 @@ namespace DeviceApp
                     if (dh.type == "get")
                     {
                         //返回数据
-                        if (LED.BackColor == Color.Green)
-                        {
-                            dh.state = "客厅灯现在开着呢！";
-                        }
-                        else
-                        if (LED.BackColor == Color.Red)
-                        {
-                            dh.state = "客厅灯现在关着呢！";
-                        }
+                        //if (LED.BackColor == Color.Green)
+                        //{
+                        //    dh.state = "客厅灯现在开着呢！";
+                        //}
+                        //else
+                        //if (LED.BackColor == Color.Red)
+                        //{
+                        //    dh.state = "客厅灯现在关着呢！";
+                        //}
                         dh.type = "response";
                         bytes = Encoding.GetEncoding("GB2312").GetBytes(SetJson(dh));
                         server.SendTo(bytes, ip);
@@ -164,7 +164,7 @@ namespace DeviceApp
             try
             {
                 DeviceHelper dh = new DeviceHelper();
-                dh.type = comboBox1.Text;
+               // dh.type = comboBox1.Text;
                 dh.userid = textBox3.Text;
                 dh.deviceid = textBox6.Text;
                 dh.state = textBox5.Text;
@@ -186,38 +186,16 @@ namespace DeviceApp
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (button3.Text == "停止")
-            {
-                server.Close();
-                recThread.Abort();
-            }
+            //if (button3.Text == "停止")
+            //{
+            //    server.Close();
+            //    recThread.Abort();
+            //}
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (button3.Text == "启动")
-            {
-                button3.Text = "停止";
-                bytes = new byte[1024];
-                ip = new IPEndPoint(IPAddress.Parse(textBox1.Text), int.Parse(textBox2.Text));
-                server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                recThread = new Thread(RecMothed);
-                recThread.Start();
-                button1.Enabled = true;
-                timer1.Enabled = true;
-                timer1.Interval = 200;
-                timer1.Start();
-            }
-            else
-            {
-                button3.Text = "启动";
-                addText("已停止服务！\r\n\r\n");
-                button1.Enabled = false;
-                recThread.Abort();
-                server.Close();
-                server.Dispose();
-                timer1.Stop();
-            }
+            
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -239,6 +217,33 @@ namespace DeviceApp
             {
                 addText(ex.ToString() + "\r\n\r\n");
             }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //if (button3.Text == "启动")
+            //{
+            //    button3.Text = "停止";
+            //    bytes = new byte[1024];
+            //    ip = new IPEndPoint(IPAddress.Parse(textBox1.Text), int.Parse(textBox2.Text));
+            //    server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            //    recThread = new Thread(RecMothed);
+            //    recThread.Start();
+            //    button1.Enabled = true;
+            //    timer1.Enabled = true;
+            //    timer1.Interval = 200;
+            //    timer1.Start();
+            //}
+            //else
+            //{
+            //    button3.Text = "启动";
+            //    addText("已停止服务！\r\n\r\n");
+            //    button1.Enabled = false;
+            //    recThread.Abort();
+            //    server.Close();
+            //    server.Dispose();
+            //    timer1.Stop();
+            //}
         }
     }
 

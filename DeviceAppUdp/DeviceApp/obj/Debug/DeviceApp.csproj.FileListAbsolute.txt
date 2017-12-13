@@ -46,3 +46,12 @@ C:\Users\Administrator\Desktop\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.Form1.
 C:\Users\Administrator\Desktop\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.Properties.Resources.resources
 C:\Users\Administrator\Desktop\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.csproj.GenerateResource.Cache
 C:\Users\Administrator\Desktop\DeviceAppUdp\DeviceApp\bin\Debug\DeviceApp.pdb
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\bin\Debug\DeviceApp.exe.config
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\bin\Debug\DeviceApp.exe
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\bin\Debug\DeviceApp.pdb
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.csprojResolveAssemblyReference.cache
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.Form1.resources
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.Properties.Resources.resources
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.csproj.GenerateResource.Cache
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.exe
+D:\github\DeviceAppUdp\DeviceAppUdp\DeviceApp\obj\Debug\DeviceApp.pdb
