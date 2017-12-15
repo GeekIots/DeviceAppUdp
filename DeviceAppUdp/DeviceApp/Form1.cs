@@ -26,10 +26,15 @@ namespace DeviceApp
             {
                 richTextBox_Msg.AppendText("\n");
                 richTextBox_Msg.SelectionColor = Color.LightGray;
-                richTextBox_Msg.AppendText("\n---------------------------------\n");
+                richTextBox_Msg.AppendText("---------------------------------\n");
             }
+
+            //时间行
+            richTextBox_Msg.SelectionColor = Color.Tomato;
+            richTextBox_Msg.AppendText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "\n");
+            //内容
             richTextBox_Msg.SelectionColor = color;
-            richTextBox_Msg.AppendText(text);
+            richTextBox_Msg.AppendText(text+"\n");
 
             //滚动到最后一行
             richTextBox_Msg.SelectionStart = richTextBox_Msg.TextLength;
@@ -42,7 +47,7 @@ namespace DeviceApp
         public void LogError(string text)
         {
             LogAppendDelegate la = new LogAppendDelegate(LogAppend);
-            richTextBox_Msg.Invoke(la, Color.Red, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "\n" + text);
+            richTextBox_Msg.Invoke(la, Color.Red,   text);
         }
         /// <summary> 
         /// 显示警告信息 
@@ -51,7 +56,7 @@ namespace DeviceApp
         public void LogWarning(string text)
         {
             LogAppendDelegate la = new LogAppendDelegate(LogAppend);
-            richTextBox_Msg.Invoke(la, Color.Violet, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "\n" + text);
+            richTextBox_Msg.Invoke(la, Color.Violet,  text);
         }
         /// <summary> 
         /// 显示信息 
@@ -60,7 +65,7 @@ namespace DeviceApp
         public void LogMessage(string text)
         {
             LogAppendDelegate la = new LogAppendDelegate(LogAppend);
-            richTextBox_Msg.Invoke(la, Color.Black, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "\n" + text);
+            richTextBox_Msg.Invoke(la, Color.Black,  text);
         }
         #endregion
 
@@ -92,10 +97,11 @@ namespace DeviceApp
             configStr = Ini.Read("心跳配置", "用户ID");
             if (configStr != "null")
                 textBox_UserID.Text = configStr;
-            //监听配置
-            configStr = Ini.Read("监听配置", "设备ID");
+            configStr = Ini.Read("心跳配置", "设备ID");
             if (configStr != "null")
                 textBox_DeviceId.Text = configStr;
+
+            //监听配置
             configStr = Ini.Read("监听配置", "开指令");
             if (configStr != "null")
                 textBox_opencmd.Text = configStr;
@@ -161,6 +167,39 @@ namespace DeviceApp
                                     else
                                     {
                                         dh.state = "指令不匹配";
+                                    }
+                                }
+                                else
+                                {
+                                    dh.state = "设备未就绪";
+                                }
+
+                                dh.type = "response";
+                                bytes = Encoding.GetEncoding("GB2312").GetBytes(SetJson(dh));
+                                server.SendTo(bytes, ip);
+                                LogMessage(string.Format("响应:{0}", SetJson(dh)));
+                            }
+                        }
+                    }
+                    else if (dh.type == "get")
+                    {
+                        //是否监听设备
+                        if (checkBox_ListenSwitch.Checked)
+                        {
+                            //判断用户ID和设备ID
+                            if (dh.userid == textBox_UserID.Text)
+                            {
+                                if (dh.deviceid == textBox_DeviceId.Text)
+                                {
+                                    //状态判断
+                                    if (textBox_SwitchLed.BackColor==Color.Green)
+                                    {
+                                        dh.state = "开着呢";
+                                    }
+                                    else
+                                    if (dh.state == textBox_closecmd.Text)
+                                    {
+                                        dh.state = "关着呢";
                                     }
                                 }
                                 else
@@ -289,22 +328,31 @@ namespace DeviceApp
                 DeviceHelper dh = new DeviceHelper();
                 dh.type = "identity";
                 dh.userid = textBox_UserID.Text;
-                dh.deviceid = " ";
+                dh.deviceid = textBox_DeviceId.Text;
                 dh.state = " ";
                 string str = SetJson(dh);
                 bytes = Encoding.GetEncoding("GB2312").GetBytes(str);
                 server.SendTo(bytes, ip);
-                LogMessage(string.Format("Heart:{0}", str));
+                LogMessage(string.Format("心跳包:{0}", str));
 
-                //label_HeartLed.ForeColor = Color.Red;
-                //Thread.Sleep(200);
-                //label_HeartLed.ForeColor = Color.LightGray;
-                //Thread.Sleep(200);
+                label_HeartLed.ForeColor = Color.Red;
+                Thread thh = new Thread(Heart);
+                thh.Start();
+                
             }
             catch (Exception ex)
             {
                 LogError(ex.ToString());
             }
+        }
+
+        private void Heart()
+        {
+            this.Invoke(new MethodInvoker(delegate
+            {
+                Thread.Sleep(200);
+                label_HeartLed.ForeColor = Color.LightGray;
+            }));
         }
 
         #region ip和port 有效性判断
@@ -446,11 +494,16 @@ namespace DeviceApp
                 timer_Heart.Start();
                 comboBox_HeartCirle.Enabled = false;
                 textBox_UserID.ReadOnly = true;
+                textBox_DeviceId.ReadOnly = true;
+
+                //开始监听
+                checkBox_ListenSwitch.Checked = true;
             }
             else
             {
                 //关闭定时器
                 timer_Heart.Stop();
+                textBox_DeviceId.ReadOnly = false;
                 comboBox_HeartCirle.Enabled = true;
                 textBox_UserID.ReadOnly = false;
             }
@@ -462,7 +515,7 @@ namespace DeviceApp
             //更新定时器频率
             timer_Heart.Interval = int.Parse(comboBox_HeartCirle.Text) * 1000;
             //存储配置
-            Ini.Write("心跳配置", "心跳周期", comboBox_HeartCirle.Text);
+            Ini.Write("心跳配置", "周期", comboBox_HeartCirle.Text);
         }
 
         //用户id变化
@@ -472,6 +525,12 @@ namespace DeviceApp
             Ini.Write("心跳配置", "用户ID", textBox_UserID.Text);
         }
 
+        //设备id变化
+        private void textBox_DeviceId_TextChanged_1(object sender, EventArgs e)
+        {
+            //存储配置
+            Ini.Write("心跳配置", "设备ID", textBox_DeviceId.Text);
+        }
         //服务器IP变化
         private void textBox_ServerIP_TextChanged(object sender, EventArgs e)
         {
@@ -601,18 +660,18 @@ namespace DeviceApp
                     return;
                 }
 
-                textBox_DeviceId.ReadOnly = true;
                 textBox_opencmd.ReadOnly = true;
                 textBox_closecmd.ReadOnly = true;
             }
             else
             {
-                textBox_DeviceId.ReadOnly = false;
                 textBox_opencmd.ReadOnly = false;
                 textBox_closecmd.ReadOnly = false;
             }
         }
         #endregion
+
+
     }
 
     /// <summary>

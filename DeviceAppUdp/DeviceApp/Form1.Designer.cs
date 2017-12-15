@@ -38,9 +38,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.textBox_UserID = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.textBox_SwitchLed = new System.Windows.Forms.TextBox();
-            this.textBox_DeviceId = new System.Windows.Forms.TextBox();
             this.timer_Heart = new System.Windows.Forms.Timer(this.components);
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -50,6 +48,8 @@
             this.label_StateLED = new System.Windows.Forms.Label();
             this.button_Connect = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.textBox_DeviceId = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.comboBox_HeartCirle = new System.Windows.Forms.ComboBox();
             this.checkBox_Heart = new System.Windows.Forms.CheckBox();
@@ -155,33 +155,15 @@
             this.textBox_UserID.Text = "1509639203636";
             this.textBox_UserID.TextChanged += new System.EventHandler(this.textBox_UserID_TextChanged);
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 31);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(80, 16);
-            this.label6.TabIndex = 12;
-            this.label6.Text = "设 备 ID:";
-            // 
             // textBox_SwitchLed
             // 
             this.textBox_SwitchLed.BackColor = System.Drawing.Color.LightGray;
             this.textBox_SwitchLed.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox_SwitchLed.Location = new System.Drawing.Point(198, 135);
+            this.textBox_SwitchLed.Location = new System.Drawing.Point(198, 94);
             this.textBox_SwitchLed.Name = "textBox_SwitchLed";
             this.textBox_SwitchLed.ReadOnly = true;
             this.textBox_SwitchLed.Size = new System.Drawing.Size(52, 26);
             this.textBox_SwitchLed.TabIndex = 10;
-            // 
-            // textBox_DeviceId
-            // 
-            this.textBox_DeviceId.Location = new System.Drawing.Point(99, 28);
-            this.textBox_DeviceId.Name = "textBox_DeviceId";
-            this.textBox_DeviceId.Size = new System.Drawing.Size(154, 26);
-            this.textBox_DeviceId.TabIndex = 9;
-            this.textBox_DeviceId.Text = "1";
-            this.textBox_DeviceId.TextChanged += new System.EventHandler(this.textBox_DeviceId_TextChanged);
             // 
             // timer_Heart
             // 
@@ -191,7 +173,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 103);
+            this.label7.Location = new System.Drawing.Point(6, 62);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(80, 16);
             this.label7.TabIndex = 20;
@@ -200,7 +182,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 66);
+            this.label8.Location = new System.Drawing.Point(6, 25);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(80, 16);
             this.label8.TabIndex = 21;
@@ -208,7 +190,7 @@
             // 
             // textBox_closecmd
             // 
-            this.textBox_closecmd.Location = new System.Drawing.Point(99, 100);
+            this.textBox_closecmd.Location = new System.Drawing.Point(99, 59);
             this.textBox_closecmd.Name = "textBox_closecmd";
             this.textBox_closecmd.Size = new System.Drawing.Size(154, 26);
             this.textBox_closecmd.TabIndex = 19;
@@ -217,7 +199,7 @@
             // 
             // textBox_opencmd
             // 
-            this.textBox_opencmd.Location = new System.Drawing.Point(99, 63);
+            this.textBox_opencmd.Location = new System.Drawing.Point(99, 22);
             this.textBox_opencmd.Name = "textBox_opencmd";
             this.textBox_opencmd.Size = new System.Drawing.Size(154, 26);
             this.textBox_opencmd.TabIndex = 18;
@@ -265,6 +247,8 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.textBox_DeviceId);
+            this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.label9);
             this.groupBox2.Controls.Add(this.comboBox_HeartCirle);
             this.groupBox2.Controls.Add(this.checkBox_Heart);
@@ -275,10 +259,28 @@
             this.groupBox2.Font = new System.Drawing.Font("宋体", 12F);
             this.groupBox2.Location = new System.Drawing.Point(7, 138);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(259, 131);
+            this.groupBox2.Size = new System.Drawing.Size(259, 169);
             this.groupBox2.TabIndex = 23;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "心跳配置";
+            // 
+            // textBox_DeviceId
+            // 
+            this.textBox_DeviceId.Location = new System.Drawing.Point(99, 98);
+            this.textBox_DeviceId.Name = "textBox_DeviceId";
+            this.textBox_DeviceId.Size = new System.Drawing.Size(154, 26);
+            this.textBox_DeviceId.TabIndex = 21;
+            this.textBox_DeviceId.Text = "1";
+            this.textBox_DeviceId.TextChanged += new System.EventHandler(this.textBox_DeviceId_TextChanged_1);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 101);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(80, 16);
+            this.label6.TabIndex = 22;
+            this.label6.Text = "设 备 ID:";
             // 
             // label9
             // 
@@ -313,7 +315,7 @@
             // checkBox_Heart
             // 
             this.checkBox_Heart.AutoSize = true;
-            this.checkBox_Heart.Location = new System.Drawing.Point(99, 99);
+            this.checkBox_Heart.Location = new System.Drawing.Point(99, 141);
             this.checkBox_Heart.Name = "checkBox_Heart";
             this.checkBox_Heart.Size = new System.Drawing.Size(15, 14);
             this.checkBox_Heart.TabIndex = 17;
@@ -323,7 +325,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 96);
+            this.label4.Location = new System.Drawing.Point(6, 138);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(80, 16);
             this.label4.TabIndex = 7;
@@ -334,7 +336,7 @@
             this.label_HeartLed.AutoSize = true;
             this.label_HeartLed.Font = new System.Drawing.Font("微软雅黑", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label_HeartLed.ForeColor = System.Drawing.Color.LightGray;
-            this.label_HeartLed.Location = new System.Drawing.Point(120, 89);
+            this.label_HeartLed.Location = new System.Drawing.Point(120, 131);
             this.label_HeartLed.Name = "label_HeartLed";
             this.label_HeartLed.Size = new System.Drawing.Size(35, 31);
             this.label_HeartLed.TabIndex = 20;
@@ -399,7 +401,7 @@
             // checkBox_ListenSwitch
             // 
             this.checkBox_ListenSwitch.AutoSize = true;
-            this.checkBox_ListenSwitch.Location = new System.Drawing.Point(99, 140);
+            this.checkBox_ListenSwitch.Location = new System.Drawing.Point(99, 99);
             this.checkBox_ListenSwitch.Name = "checkBox_ListenSwitch";
             this.checkBox_ListenSwitch.Size = new System.Drawing.Size(15, 14);
             this.checkBox_ListenSwitch.TabIndex = 18;
@@ -409,8 +411,6 @@
             // groupBox6
             // 
             this.groupBox6.Controls.Add(this.checkBox_ListenSwitch);
-            this.groupBox6.Controls.Add(this.textBox_DeviceId);
-            this.groupBox6.Controls.Add(this.label6);
             this.groupBox6.Controls.Add(this.textBox_SwitchLed);
             this.groupBox6.Controls.Add(this.label5);
             this.groupBox6.Controls.Add(this.label7);
@@ -418,9 +418,9 @@
             this.groupBox6.Controls.Add(this.textBox_closecmd);
             this.groupBox6.Controls.Add(this.label8);
             this.groupBox6.Font = new System.Drawing.Font("宋体", 12F);
-            this.groupBox6.Location = new System.Drawing.Point(7, 273);
+            this.groupBox6.Location = new System.Drawing.Point(7, 313);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(259, 167);
+            this.groupBox6.Size = new System.Drawing.Size(259, 127);
             this.groupBox6.TabIndex = 24;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "监听配置";
@@ -428,7 +428,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 136);
+            this.label5.Location = new System.Drawing.Point(6, 95);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(80, 16);
             this.label5.TabIndex = 20;
@@ -567,9 +567,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBox_UserID;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBox_SwitchLed;
-        private System.Windows.Forms.TextBox textBox_DeviceId;
         private System.Windows.Forms.Timer timer_Heart;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
@@ -600,6 +598,8 @@
         private System.Windows.Forms.ComboBox comboBox_CmdType;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TextBox textBox_DeviceId;
+        private System.Windows.Forms.Label label6;
     }
 }
 
